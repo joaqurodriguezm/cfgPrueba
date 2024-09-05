@@ -1,5 +1,5 @@
 from openpyxl import Workbook
-from openpyxl.styles import Protection
+from openpyxl.styles import Protection, NamedStyle
 from openpyxl.worksheet.datavalidation import DataValidation
 
 # Crear un archivo Excel
@@ -18,6 +18,26 @@ for i in range(2, 12):
 for j in range(2, 6):
     cell = ws.cell(row=1, column=j)
     cell.value = f'Pregunta{j-1}'
+
+# Crear cuerpo para para preguntas que acepten enteros y decimales ( incluyendo negativos )
+
+dv1 = DataValidation(type="decimal",
+                    operator="between",
+                    formula1=None,
+                    formula2=None,
+                    showErrorMessage=True,
+                    errorTitle="Entrada inválida",
+                    error="Solo se permiten números enteros o decimales con separador ','"
+                    )
+
+# Crear y aplicar formato para permitir números negativos
+formato_numerico = NamedStyle(name="formato_decimal")
+formato_numerico.number_format = "#,##0.00"
+
+for row in ws['B2:B11']:
+    for cell in row:
+        dv1.add(cell)
+
 
 # Crear lista desplegable para preguntas abiertas simples (P2)
 dv2 = DataValidation(type="list",
@@ -42,6 +62,8 @@ for row in ws['E2:E11']:
     for cell in row:
         dv4.add(cell)
 
+# Agregar validaciones a la hoja
+ws.add_data_validation(dv1)
 ws.add_data_validation(dv2)
 ws.add_data_validation(dv4)
 
