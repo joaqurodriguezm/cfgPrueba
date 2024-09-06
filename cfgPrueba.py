@@ -19,7 +19,7 @@ for j in range(2, 6):
     cell = ws.cell(row=1, column=j)
     cell.value = f'Pregunta{j-1}'
 
-# Crear cuerpo para para preguntas que acepten enteros y decimales ( incluyendo negativos )
+# Crear lógica para preguntas que acepten enteros y decimales, incluyendo negativos (P1)
 
 dv1 = DataValidation(type="decimal",
                     operator="between",
@@ -27,8 +27,7 @@ dv1 = DataValidation(type="decimal",
                     formula2=None,
                     showErrorMessage=True,
                     errorTitle="Entrada inválida",
-                    error="Solo se permiten números enteros o decimales con separador ','"
-                    )
+                    error="Solo se permiten números enteros o decimales con separador ','")
 
 # Crear y aplicar formato para permitir números negativos
 formato_numerico = NamedStyle(name="formato_decimal")
@@ -50,6 +49,22 @@ for row in ws['C2:C11']:
     for cell in row:
         dv2.add(cell)
 
+# Crear lógica para preguntas que acepten fracciones (P3)
+dv3 = DataValidation(type="custom",
+                    formula1='=AND(ISNUMBER(VALUE(LEFT(D2,FIND("/",D2)-1))),ISNUMBER(VALUE(MID(D2,FIND("/",D2)+1,LEN(D2)-FIND("/",D2)))),COUNTIF(D2,"*/?*")=1)',
+                    showErrorMessage=True,
+                    error="Solo se permiten fracciones en formato numerador/denominador, ej: 1/2",
+                    errorTitle="Entrada inválida"
+)
+
+for row in ws ['D2:D11']:
+    for cell in row:
+        dv3.add(cell)
+
+# Establecer el formato de texto en las celdas
+for row in ws['D2:D11']:
+    for cell in row:
+        cell.number_format = '@'  # Formato de texto
 
 # Crear lista desplegable para preguntas de selección múltiple (P4)
 dv4 = DataValidation(type="list",
@@ -65,6 +80,7 @@ for row in ws['E2:E11']:
 # Agregar validaciones a la hoja
 ws.add_data_validation(dv1)
 ws.add_data_validation(dv2)
+ws.add_data_validation(dv3)
 ws.add_data_validation(dv4)
 
 
