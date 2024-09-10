@@ -14,8 +14,8 @@ for i in range(2, 12):
     cell = ws[f'A{i}']
     cell.value = f'Alumno{i-1}'
 
-# Escribir Pregunta1, Pregunta2, ..., Pregunta4 en las celdas B1 hasta E1 y protegerlas
-for j in range(2, 6):
+# Escribir Pregunta1, Pregunta2, ..., Pregunta5 en las celdas B1 hasta F1 y protegerlas
+for j in range(2, 7):
     cell = ws.cell(row=1, column=j)
     cell.value = f'Pregunta{j-1}'
 
@@ -66,7 +66,7 @@ for row in ws['D2:D11']:
     for cell in row:
         cell.number_format = '@'  # Formato de texto
 
-# Crear lista desplegable para preguntas de selección múltiple (P4)
+# Crear lista desplegable para preguntas de selección única (P4)
 dv4 = DataValidation(type="list",
                     formula1='"A, B, C, D, N, N/C"',
                     showErrorMessage=True,
@@ -77,6 +77,8 @@ for row in ws['E2:E11']:
     for cell in row:
         dv4.add(cell)
 
+# Crear lógica para preguntas de selección múltiple (P5)
+
 # Agregar validaciones a la hoja
 ws.add_data_validation(dv1)
 ws.add_data_validation(dv2)
@@ -84,7 +86,7 @@ ws.add_data_validation(dv3)
 ws.add_data_validation(dv4)
 
 
-for row in ws['B2:E11']:
+for row in ws['B2:F11']:
     for cell in row:
         cell.protection = Protection(locked=False)
 
