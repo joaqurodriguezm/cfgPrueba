@@ -8,11 +8,13 @@ def inicializar_hoja(ws):
     for i in range(2, 12):
         cell = ws[f'A{i}']
         cell.value = f'Alumno{i-1}'
+        cell.protection = Protection(locked=True)  # Proteger celdas A2:A11
 
-    # Escribir Pregunta1, Pregunta2, ..., Pregunta5 en las celdas B1 hasta F1 y protegerlas
-    for j in range(2, 7):
+    # Escribir Pregunta1, Pregunta2, ..., Pregunta6 en las celdas B1 hasta F1 y protegerlas
+    for j in range(2, 8):
         cell = ws.cell(row=1, column=j)
         cell.value = f'Pregunta{j-1}'
+        cell.protection = Protection(locked=True)  # Proteger celdas B1:F1
 
     # Crear lógica para preguntas que acepten enteros y decimales, incluyendo negativos (P1)
     dv1 = DataValidation(type="decimal",
@@ -48,10 +50,6 @@ def inicializar_hoja(ws):
     for row in ws['D2:D11']:  # Solo para Pregunta 3 (Columna D)
         for cell in row:
             dv3.add(cell)
-
-    # Establecer el formato de texto en las celdas de Pregunta 3
-    for row in ws['D2:D11']:  # Solo para Pregunta 3 (Columna D)
-        for cell in row:
             cell.number_format = '@'  # Formato de texto
 
     # Crear lista desplegable para preguntas de selección única (P4)
@@ -65,16 +63,32 @@ def inicializar_hoja(ws):
         for cell in row:
             dv4.add(cell)
 
-    # Agregar validaciones a la hoja (excepto Pregunta 5)
+    # Crear lógica para preguntas que acepten pares ordenados (P6)
+    dv6 = DataValidation(type="custom",
+                        formula1='=AND(ISNUMBER(VALUE(LEFT(G2,FIND(";",G2)-1))),ISNUMBER(VALUE(MID(G2,FIND(";",G2)+1,LEN(G2)-FIND(";",G2)))),COUNTIF(G2,"*;?*")=1)',
+                        showErrorMessage=True,
+                        error="Solo se permiten valores en formato de par ordenado, ej: X;Y",
+                        errorTitle="Entrada inválida")
+    
+    for row in ws['G2:G11']:
+        for cell in row:
+            dv6.add(cell)
+            cell.number_format = '@'  # Formato de texto
+
+    # Agregar validaciones a la hoja
     ws.add_data_validation(dv1)
     ws.add_data_validation(dv2)
     ws.add_data_validation(dv3)
     ws.add_data_validation(dv4)
+    ws.add_data_validation(dv6)
 
-    # Desbloquear solo las celdas B2:E11 (Preguntas 1 a 4) para que se puedan editar
-    for row in ws['B2:E11']:  # Solo para las Preguntas 1 a 4 (Columnas B a E)
+    # Desbloquear solo las celdas B2:G11 (Preguntas 1 a 6)
+    for row in ws_preguntas['B2:G11']:
         for cell in row:
             cell.protection = Protection(locked=False)
+
+    # Bloquear las demás celdas por defecto
+    ws.protection.sheet = True 
 
 # Crear un archivo Excel
 wb = Workbook()
@@ -98,6 +112,11 @@ for i in range(2, 12):
         cell_pregunta = ws_preguntas.cell(row=i, column=j)
         cell_respuesta.value = f'=IF(Preguntas!{cell_pregunta.coordinate}="","",Preguntas!{cell_pregunta.coordinate})'
 
+# Referenciar los datos de la Pregunta 6 (columna G) en la hoja 'Respuestas'
+for i in range(2, 12):  # Para las filas 2 a 11
+    cell_respuesta = ws_respuestas.cell(row=i, column=7)  # Columna G en la hoja de respuestas
+    cell_pregunta = ws_preguntas.cell(row=i, column=7)    # Columna G en la hoja de preguntas
+    cell_respuesta.value = f'=IF(Preguntas!{cell_pregunta.coordinate}="","", "("&Preguntas!{cell_pregunta.coordinate}&")")'
 
 # Referenciar los datos de K1:K10 en la hoja 'Datos' a F2:F11 en la hoja 'Respuestas'
 for i in range(2, 12):
