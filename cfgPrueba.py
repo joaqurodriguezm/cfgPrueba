@@ -113,9 +113,9 @@ for i in range(2, 12):
         cell_respuesta.value = f'=IF(Preguntas!{cell_pregunta.coordinate}="","",Preguntas!{cell_pregunta.coordinate})'
 
 # Referenciar los datos de la Pregunta 6 (columna G) en la hoja 'Respuestas'
-for i in range(2, 12):  # Para las filas 2 a 11
-    cell_respuesta = ws_respuestas.cell(row=i, column=7)  # Columna G en la hoja de respuestas
-    cell_pregunta = ws_preguntas.cell(row=i, column=7)    # Columna G en la hoja de preguntas
+for i in range(2, 12):
+    cell_respuesta = ws_respuestas.cell(row=i, column=7)
+    cell_pregunta = ws_preguntas.cell(row=i, column=7)
     cell_respuesta.value = f'=IF(Preguntas!{cell_pregunta.coordinate}="","", "("&Preguntas!{cell_pregunta.coordinate}&")")'
 
 # Referenciar los datos de K1:K10 en la hoja 'Datos' a F2:F11 en la hoja 'Respuestas'
@@ -132,7 +132,7 @@ file_path = r'C:\Users\joaquin.rodriguezm\Desktop\cfgPrueba.xlsx'
 wb.save(file_path)
 
 # Usar xlwings para agregar el código VBA que genera los CheckBoxes
-app = xw.App(visible=False)  # Crea una instancia de Excel sin mostrar la ventana
+app = xw.App(visible=False) 
 wb = app.books.open(file_path)
 
 # Código VBA para agregar las casillas de verificación en el rango F2:F11 y vincularlas a celdas en la hoja Datos
@@ -184,7 +184,7 @@ End Sub
 """
 
 # Agregar el código VBA al módulo
-vba_module = wb.api.VBProject.VBComponents.Add(1)  # 1 representa un módulo estándar
+vba_module = wb.api.VBProject.VBComponents.Add(1) 
 vba_module.CodeModule.AddFromString(vba_code)
 
 # Ejecutar la macro para agregar los checkboxes y establecer los vínculos
